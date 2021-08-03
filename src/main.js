@@ -1,4 +1,5 @@
 import { World } from './World/World';
+import { onMouseMove } from './World/tooltip';
 import './style.css'
 
 const container = document.querySelector('#scene-container');
@@ -9,9 +10,11 @@ window.addEventListener('load', _ => {
   world.load_material();
 })
 
-function main() {
+window.addEventListener('mousemove', onMouseMove, false);
+
+function animate() {
+  window.requestAnimationFrame(animate);
   world.render();
-  window.requestAnimationFrame(main);
 }
 
-main();
+animate();
