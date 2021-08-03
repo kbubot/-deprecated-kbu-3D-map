@@ -6,6 +6,7 @@ import * as dat from 'dat.gui'
 
 import { createCamera } from './components/camera.js';
 import { createCube } from './components/cube.js';
+import { createBuilding } from './components/building.js'
 import { createScene } from './components/scene.js';
 import { createLights } from './components/lights.js';
 
@@ -17,16 +18,16 @@ let camera;
 let renderer;
 let scene;
 let controls;
-
+var tooltipEnabledObjects = [];
 
 class World {
   constructor(container, canvas) {
     camera = createCamera();
     scene = createScene();
     renderer = createRenderer(canvas);
-
-    const cube = createCube();
     const light = createLights();
+
+    createBuilding(scene, tooltipEnabledObjects);
     scene.add(light);
 
     controls = new OrbitControls(camera, canvas);
@@ -44,10 +45,10 @@ class World {
     const mtlLoader = new MTLLoader();
     const gui = new dat.GUI();
 
-    mtlLoader.load('demo.mtl', mtl => {
+    mtlLoader.load('demo_notGalmel.mtl', mtl => {
       mtl.preload();
       objLoader.setMaterials(mtl);
-      objLoader.load('demo.obj', root => {
+      objLoader.load('demo_notGalmel.obj', root => {
         gui.add(root.position, 'x').min(0).max(9)
         gui.add(root.position, 'y').min(0).max(9)
         gui.add(root.position, 'z').min(0).max(9)
@@ -67,4 +68,4 @@ class World {
   }
 }
 
-export { World };
+export { World, tooltipEnabledObjects, renderer, camera };
