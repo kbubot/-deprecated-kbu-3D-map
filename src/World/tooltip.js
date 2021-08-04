@@ -10,7 +10,7 @@ var tooltipDisplayTimeout;
 function hideTooltip() {
   var divElement = document.querySelector("#tooltip");
   if (divElement) {
-    divElement.style.display = 'block';
+    divElement.style.display = 'none';
   }
 }
 
@@ -19,7 +19,7 @@ function showTooltip() {
 
   if (divElement && latestMouseProjection) {
     divElement.style.display = 'block';
-    divElement.style.opacity = 0.0;
+    divElement.style.opacity = 0.5;
 
     var canvasHalfWidth = renderer.domElement.offsetWidth / 2;
     var canvasHalfHeight = renderer.domElement.offsetHeight / 2;
@@ -28,8 +28,8 @@ function showTooltip() {
     tooltipPosition.x = (tooltipPosition.x * canvasHalfWidth) + canvasHalfWidth + renderer.domElement.offsetLeft;
     tooltipPosition.y = -(tooltipPosition.y * canvasHalfHeight) + canvasHalfHeight + renderer.domElement.offsetTop;
 
-    var tootipWidth = divElement[0].offsetWidth;
-    var tootipHeight = divElement[0].offsetHeight;
+    var tootipWidth = divElement.offsetWidth;
+    var tootipHeight = divElement.offsetHeight;
 
     divElement.style.left = `${tooltipPosition.x - tootipWidth / 2}px`;
     divElement.style.top = `${tooltipPosition.y - tootipHeight - 5}px`;
@@ -49,7 +49,7 @@ function updateMouseCoords(event, coordsObj) {
 function handleManipulationUpdate() {
   raycaster.setFromCamera(mouse, camera); {
     var intersects = raycaster.intersectObjects(tooltipEnabledObjects);
-    console.log(intersects);
+    // console.log(intersects);
     if (intersects.length > 0) {
       latestMouseProjection = intersects[0].point;
       hoveredObj = intersects[0].object;
