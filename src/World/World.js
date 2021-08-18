@@ -1,59 +1,59 @@
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader';
 import { MTLLoader } from 'three/examples/jsm/loaders/MTLLoader';
 import { Box3, Vector3 } from 'three';
-import * as dat from 'dat.gui'
 
 import { createCamera } from './components/camera.js';
-import { createCube } from './components/cube.js';
 import { createBuilding } from './components/building.js'
 import { createScene } from './components/scene.js';
 import { createLights } from './components/lights.js';
-
 import { createRenderer } from './systems/renderer.js';
+import { createControls } from './systems/controls.js';
 import { Resizer } from './systems/Resizer.js';
 import { frameArea } from "./utils";
+
+const canvas = document.querySelector('canvas.webgl');
 
 let camera;
 let renderer;
 let scene;
 let controls;
-var tooltipEnabledObjects = [];
+let resizer;
+
+const tooltipEnabledObjects = [];
 
 class World {
-  constructor(container, canvas) {
+  constructor() {
     camera = createCamera();
     scene = createScene();
-    renderer = createRenderer(canvas);
     const light = createLights();
-
+    /**
+     * TODO: 각 빌딩을 promise객체화해서 병행적으로 로드하기
+     */
     createBuilding(scene, tooltipEnabledObjects);
+
+    renderer = createRenderer(canvas);
+    controls = createControls(camera, renderer.domElement);
+    resizer = new Resizer(renderer);
     scene.add(light);
-
-    controls = new OrbitControls(camera, canvas);
-    controls.target.set(0, 5, 0);
-    controls.update();
-
-    const resizer = new Resizer(container, camera, renderer)
-    container.append(renderer.domElement);
   }
   render() {
     renderer.render(scene, camera);
   }
-  load_material() {
+  checkResize() {
+    return resizer.resizeRendererToDisplaySize(renderer);
+  }
+  resize() {
+    resizer.resize(camera, renderer);
+  }
+  load_map_material() {
     const objLoader = new OBJLoader();
     const mtlLoader = new MTLLoader();
-    const gui = new dat.GUI();
 
-    mtlLoader.load('demo_notGalmel.mtl', mtl => {
+    mtlLoader.load('demo_notFog.mtl', mtl => {
       mtl.preload();
       objLoader.setMaterials(mtl);
-      objLoader.load('demo_notGalmel.obj', root => {
-        gui.add(root.position, 'x').min(0).max(9)
-        gui.add(root.position, 'y').min(0).max(9)
-        gui.add(root.position, 'z').min(0).max(9)
+      objLoader.load('demo_notFog.obj', root => {
         scene.add(root);
-
         const box = new Box3().setFromObject(root);
         const boxSize = box.getSize(new Vector3()).length();
         const boxCenter = box.getCenter(new Vector3());
@@ -65,6 +65,9 @@ class World {
         controls.update();
       });
     })
+  }
+  getSystems() {
+    return { controls };
   }
 }
 
